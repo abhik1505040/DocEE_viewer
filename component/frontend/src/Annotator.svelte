@@ -45,6 +45,8 @@
       words={text.substring(start, end)}
       {label}
       id={i}
+      start={start}
+      end={end}
     />
     {#if i != ents.length - 1}
       <span class={i+1}>{text.substring(end, ents[i + 1]["start"])}</span>

@@ -88,8 +88,18 @@ def setup_sidebar(event_map):
         + "{}" * len(event_map[event]["types"]) + """</div>"""
     )
     
+    current_example_types = set([
+       k["type"] for k in event_map[event]["samples"][index][2]
+    ])
+
     span_template = """<span style = "background-color: {};"> {} </span><br>"""
-    spans = [span_template.format(color_scheme[x], x.split("█")[-1]) for x in event_map[event]["types"]]
+    spans = [
+        span_template.format(
+            color_scheme[x] if x.split("█")[-1] in current_example_types else "inherit", 
+            x.split("█")[-1]
+        ) 
+            for x in event_map[event]["types"]
+    ]
 
     st.sidebar.markdown(
         div_template.format(*spans),
@@ -123,7 +133,8 @@ def main():
     sample = event_map[event]["samples"][index]
     ents = []
 
-    collected_points = set()
+    collected_points = {}
+
     for obj in sample[2]:
         for ment in obj["mention"]:
             
@@ -134,19 +145,23 @@ def main():
                     "label": f'{event}█{obj["type"]}'
                 })
 
-                collected_points.add(
-                    (ment["start"], ment["end"])
-                )
-            else:
-                st.markdown(
-                    f"""
-                        <h5 style="color: red; text-align: center;">
-                            Multiple types found for the span positioned at: {ment["start"]} - {ment["end"]}!
-                        </h5>
-                    """,
-                    unsafe_allow_html=True
-                )
+            collected_points[(ment["start"], ment["end"])] = collected_points.get(
+                (ment["start"], ment["end"]), set()) | set([obj["type"]])
 
+            
+    for k, v in collected_points.items():
+        if len(v) == 1:
+            continue
+
+        st.markdown(
+            f"""
+                <h5 style="color: red; text-align: center;">
+                    ({', '.join(v)}) types found for the span positioned at: {k[0]} - {k[1]}!
+                </h5>
+            """,
+            unsafe_allow_html=True
+        )
+    
     docee_viewer(
         sample[0], sample[1], ents
     )

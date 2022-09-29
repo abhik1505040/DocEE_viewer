@@ -1,6 +1,8 @@
 <script lang="ts">
   export let words: string;
   export let label: string;
+  export let start: number;
+  export let end: number;
   export let id: number;
 
   import { createEventDispatcher } from "svelte";
@@ -657,5 +659,5 @@
 
 <mark style={labelColor}>
   {words}
-  <span class="tooltiptext">{`${label.split("█")[1]}`}</span>
+  <span class="tooltiptext">{`${label.split("█")[1]} (${start}-${end})`}</span>
 </mark>
