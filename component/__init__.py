@@ -148,7 +148,7 @@ def main():
             collected_points[(ment["start"], ment["end"])] = collected_points.get(
                 (ment["start"], ment["end"]), set()) | set([obj["type"]])
 
-            
+    ents = sorted(ents, key=lambda k: k["start"])        
     for k, v in collected_points.items():
         if len(v) == 1:
             continue
